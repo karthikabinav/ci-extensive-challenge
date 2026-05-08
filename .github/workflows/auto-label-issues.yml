@@ -5,7 +5,7 @@ on:
     types: [opened]
 
 jobs:
-  label:
+  auto-label:
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -16,7 +16,7 @@ jobs:
           script: |
             const title = context.payload.issue.title.toLowerCase();
             const body = (context.payload.issue.body || "").toLowerCase();
-            const text = title + " " + body;
+            const text = `${title} ${body}`;
             const labels = [];
 
             if (text.includes("error")) {
@@ -31,6 +31,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                labels: labels
+                labels
               });
             }
