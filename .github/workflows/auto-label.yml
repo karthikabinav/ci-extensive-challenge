@@ -10,28 +10,25 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Label issue based on keywords
+      - name: Label bug issues
+        if: contains(github.event.issue.title, "error") || contains(github.event.issue.body, "error")
         uses: actions/github-script@v7
         with:
           script: |
-            const issue = context.payload.issue;
-            const title = issue.title.toLowerCase();
-            const body = (issue.body || "").toLowerCase();
-            const text = title + " " + body;
-            const labelsToAdd = [];
-
-            if (text.includes("error")) {
-              labelsToAdd.push("bug");
-            }
-            if (text.includes("add")) {
-              labelsToAdd.push("feature");
-            }
-
-            if (labelsToAdd.length > 0) {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: labelsToAdd
-              });
-            }
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["bug"]
+            })
+      - name: Label feature issues
+        if: contains(github.event.issue.title, "add") || contains(github.event.issue.body, "add")
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ["feature"]
+            })
