@@ -2,7 +2,7 @@ name: Auto Label Issues
 
 on:
   issues:
-    types: [opened, edited]
+    types: [opened]
 
 jobs:
   label:
@@ -10,19 +10,20 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Label issues by keyword
-        uses: actions/github-script@v7
+      - name: Label issue based on keywords
+        uses: actions/github-script@v6
         with:
           script: |
-            const title = context.payload.issue.title.toLowerCase();
-            const body = (context.payload.issue.body || "").toLowerCase();
-            const content = title + " " + body;
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = (issue.body || "").toLowerCase();
+            const text = title + " " + body;
             const labels = [];
 
-            if (content.includes("error")) {
+            if (text.includes("error")) {
               labels.push("bug");
             }
-            if (content.includes("add")) {
+            if (text.includes("add")) {
               labels.push("feature");
             }
 
@@ -30,7 +31,7 @@ jobs:
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: issue.number,
                 labels: labels
               });
             }
