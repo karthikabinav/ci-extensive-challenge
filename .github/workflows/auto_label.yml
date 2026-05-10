@@ -1,0 +1,30 @@
+name: Auto Label
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          LOWER_TITLE=$(echo "$ISSUE_TITLE" | tr "[:upper:]" "[:lower:]")
+          LOWER_BODY=$(echo "$ISSUE_BODY" | tr "[:upper:]" "[:lower:]")
+
+          LABELS=""
+
+          if [[ "$LOWER_TITLE" == *"error"* ]] || [[ "$LOWER_BODY" == *"error"* ]]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "${{ github.repository }}" --add-label "bug" || echo "Failed to add bug label"
+          fi
+
+          if [[ "$LOWER_TITLE" == *"add"* ]] || [[ "$LOWER_BODY" == *"add"* ]]; then
+            gh issue edit "$ISSUE_NUMBER" --repo "${{ github.repository }}" --add-label "feature" || echo "Failed to add feature label"
+          fi
