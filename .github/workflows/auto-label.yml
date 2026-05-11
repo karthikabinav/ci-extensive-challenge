@@ -15,13 +15,13 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
-            const text = `${issue.title} ${issue.body || }`.toLowerCase();
+            const text = (issue.title + " " + (issue.body || "")).toLowerCase();
             const labelsToAdd = [];
-            if (text.includes(error)) {
-              labelsToAdd.push(bug);
+            if (text.includes("error")) {
+              labelsToAdd.push("bug");
             }
-            if (text.includes(add)) {
-              labelsToAdd.push(feature);
+            if (text.includes("add")) {
+              labelsToAdd.push("feature");
             }
             if (labelsToAdd.length > 0) {
               try {
@@ -32,6 +32,6 @@ jobs:
                   labels: labelsToAdd
                 });
               } catch (e) {
-                core.info(`Could not add labels (they may need to be created first): ${e.message}`);
+                core.info("Could not add labels (they may need to be created first): " + e.message);
               }
             }
