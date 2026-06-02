@@ -7,26 +7,31 @@ on:
 jobs:
   label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Label bug issues
-        if: contains(github.event.issue.title, 'error')
+      - name: Label issues by keyword
         uses: actions/github-script@v6
         with:
           script: |
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: ['bug']
-            })
-      - name: Label feature issues
-        if: contains(github.event.issue.title, 'add')
-        uses: actions/github-script@v6
-        with:
-          script: |
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              labels: ['feature']
-            })
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = (issue.body || "").toLowerCase();
+            const text = title + " " + body;
+            const labelsToAdd = [];
+
+            if (text.includes("error")) {
+              labelsToAdd.push("bug");
+            }
+            if (text.includes("add")) {
+              labelsToAdd.push("feature");
+            }
+
+            if (labelsToAdd.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labelsToAdd
+              });
+            }
