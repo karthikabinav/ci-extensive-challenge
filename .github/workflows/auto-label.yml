@@ -7,10 +7,8 @@ on:
 jobs:
   label:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
-      - name: Label issues by keyword
+      - name: Label issue based on keywords
         uses: actions/github-script@v6
         with:
           script: |
@@ -19,14 +17,12 @@ jobs:
             const body = (issue.body || "").toLowerCase();
             const text = title + " " + body;
             const labels = [];
-
             if (text.includes("error")) {
               labels.push("bug");
             }
             if (text.includes("add")) {
               labels.push("feature");
             }
-
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
