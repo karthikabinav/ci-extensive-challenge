@@ -10,7 +10,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Label issues by keyword
+      - name: Label issue based on keywords
         uses: actions/github-script@v6
         with:
           script: |
@@ -18,20 +18,20 @@ jobs:
             const title = issue.title.toLowerCase();
             const body = (issue.body || "").toLowerCase();
             const text = title + " " + body;
-            const labelsToAdd = [];
+            const labels = [];
 
             if (text.includes("error")) {
-              labelsToAdd.push("bug");
+              labels.push("bug");
             }
             if (text.includes("add")) {
-              labelsToAdd.push("feature");
+              labels.push("feature");
             }
 
-            if (labelsToAdd.length > 0) {
+            if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                labels: labelsToAdd
+                labels: labels
               });
             }
