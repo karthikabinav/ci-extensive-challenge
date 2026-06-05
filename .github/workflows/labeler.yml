@@ -1,13 +1,11 @@
 name: Issue Labeler
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   label:
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
     steps:
       - uses: actions/github-script@v6
         with:
@@ -15,19 +13,13 @@ jobs:
             const title = context.payload.issue.title.toLowerCase();
             const body = (context.payload.issue.body || "").toLowerCase();
             const labels = [];
-            
-            if (title.includes("error") || body.includes("error")) {
-              labels.push("bug");
-            }
-            if (title.includes("add") || body.includes("add")) {
-              labels.push("feature");
-            }
-            
+            if (title.includes("error") || body.includes("error")) labels.push("bug");
+            if (title.includes("add") || body.includes("add")) labels.push("feature");
             if (labels.length > 0) {
               github.rest.issues.addLabels({
+                issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
                 labels: labels
-              });
+              })
             }
