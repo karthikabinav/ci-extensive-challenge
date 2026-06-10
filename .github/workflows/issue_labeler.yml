@@ -2,24 +2,32 @@ name: Issue Labeler
 on:
   issues:
     types: [opened, edited]
+
 jobs:
-  label:
+  label_issues:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - uses: actions/github-script@v6
+      - name: Label bug
+        if: contains(github.event.issue.title, 'error') || contains(github.event.issue.body, 'error')
+        uses: actions/github-script@v6
         with:
           script: |
-            const text = (context.payload.issue.title + ' ' + (context.payload.issue.body || '')).toLowerCase();
-            const labels = [];
-            if (text.includes('error')) labels.push('bug');
-            if (text.includes('add')) labels.push('feature');
-            if (labels.length > 0) {
-              github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                labels: labels
-              });
-            }
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['bug']
+            })
+      - name: Label feature
+        if: contains(github.event.issue.title, 'add') || contains(github.event.issue.body, 'add')
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['feature']
+            })
