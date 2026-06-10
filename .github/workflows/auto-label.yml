@@ -2,7 +2,7 @@ name: Auto Label Issues
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited]
 
 jobs:
   label:
@@ -10,7 +10,7 @@ jobs:
     permissions:
       issues: write
     steps:
-      - name: Label issue by keyword
+      - name: Label issue based on keywords
         uses: actions/github-script@v7
         with:
           script: |
