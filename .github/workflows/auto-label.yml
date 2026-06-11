@@ -1,4 +1,5 @@
 name: Auto Label Issues
+
 on:
   issues:
     types: [opened]
@@ -14,7 +15,7 @@ jobs:
           script: |
             const title = context.payload.issue.title.toLowerCase();
             const body = (context.payload.issue.body || "").toLowerCase();
-            const text = title + " " + body;
+            const text = `${title} ${body}`;
             const labels = [];
             if (text.includes("error")) labels.push("bug");
             if (text.includes("add")) labels.push("feature");
@@ -23,6 +24,6 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.payload.issue.number,
-                labels: labels
+                labels
               });
             }
