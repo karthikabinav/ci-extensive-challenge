@@ -11,8 +11,8 @@ jobs:
           script: |
             const title = context.payload.issue.title.toLowerCase();
             const labels = [];
-            if (title.includes(error)) labels.push(bug);
-            if (title.includes(add)) labels.push(feature);
+            if (title.includes("error")) labels.push("bug");
+            if (title.includes("add")) labels.push("feature");
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
