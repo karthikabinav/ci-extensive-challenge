@@ -1,0 +1,22 @@
+name: Auto Label Issues
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label bug if error
+        if: contains(github.event.issue.title, 'error') || contains(github.event.issue.body, 'error')
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "bug"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Label feature if add
+        if: contains(github.event.issue.title, 'add') || contains(github.event.issue.body, 'add')
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "feature"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
