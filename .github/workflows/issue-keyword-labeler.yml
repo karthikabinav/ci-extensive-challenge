@@ -1,0 +1,65 @@
+name: Issue Keyword Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions:
+  issues: write
+
+jobs:
+  label-by-keyword:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply labels by keyword
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const text = `${issue.title || ''}
+${issue.body || ''}`.toLowerCase();
+            const labels = [];
+
+            if (text.includes('error')) {
+              labels.push('bug');
+            }
+            if (text.includes('add')) {
+              labels.push('feature');
+            }
+
+            async function ensureLabel(name, color, description) {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name
+                });
+              } catch (error) {
+                if (error.status !== 404) {
+                  throw error;
+                }
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                  color,
+                  description
+                });
+              }
+            }
+
+            if (labels.includes('bug')) {
+              await ensureLabel('bug', 'd73a4a', 'Issue contains the error keyword');
+            }
+            if (labels.includes('feature')) {
+              await ensureLabel('feature', 'a2eeef', 'Issue contains the add keyword');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels
+              });
+            }
