@@ -5,33 +5,30 @@ on:
     types: [opened, edited]
 
 jobs:
-  label-issues:
+  label:
     runs-on: ubuntu-latest
     permissions:
       issues: write
     steps:
-      - name: Label issues based on keywords
-        uses: actions/github-script@v6
+      - name: Label issues by keyword
+        uses: actions/github-script@v7
         with:
           script: |
-            const issue = context.payload.issue;
-            const title = issue.title.toLowerCase();
-            const body = (issue.body || "").toLowerCase();
-            const content = title + " " + body;
-            const labelsToAdd = [];
-
-            if (content.includes("error")) {
-              labelsToAdd.push("bug");
+            const title = context.payload.issue.title || "";
+            const body = context.payload.issue.body || "";
+            const text = (title + " " + body).toLowerCase();
+            const labels = [];
+            if (text.includes("error")) {
+              labels.push("bug");
             }
-            if (content.includes("add")) {
-              labelsToAdd.push("feature");
+            if (text.includes("add")) {
+              labels.push("feature");
             }
-
-            if (labelsToAdd.length > 0) {
+            if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: issue.number,
-                labels: labelsToAdd
+                issue_number: context.payload.issue.number,
+                labels: labels
               });
             }
