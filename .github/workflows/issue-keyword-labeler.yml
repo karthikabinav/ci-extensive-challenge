@@ -16,14 +16,14 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
-            const text = `${issue.title || }\n${issue.body || }`.toLowerCase();
+            const text = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
             const labels = [];
 
-            if (text.includes(error)) {
-              labels.push(bug);
+            if (text.includes('error')) {
+              labels.push('bug');
             }
-            if (text.includes(add)) {
-              labels.push(feature);
+            if (text.includes('add')) {
+              labels.push('feature');
             }
 
             async function ensureLabel(name, color, description) {
@@ -47,11 +47,11 @@ jobs:
               }
             }
 
-            if (labels.includes(bug)) {
-              await ensureLabel(bug, d73a4a, Issue contains the error keyword);
+            if (labels.includes('bug')) {
+              await ensureLabel('bug', 'd73a4a', 'Issue contains the error keyword');
             }
-            if (labels.includes(feature)) {
-              await ensureLabel(feature, a2eeef, Issue contains the add keyword);
+            if (labels.includes('feature')) {
+              await ensureLabel('feature', 'a2eeef', 'Issue contains the add keyword');
             }
 
             if (labels.length > 0) {
