@@ -16,7 +16,7 @@ jobs:
         with:
           script: |
             const issue = context.payload.issue;
-            const text = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
+            const text = `${issue.title || }\n${issue.body || }`.toLowerCase();
             const labels = [];
 
             if (text.includes('error')) {
