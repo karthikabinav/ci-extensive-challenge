@@ -5,12 +5,7 @@ Automation script to label GitHub issues by keyword.
 - label "feature" if the issue contains "add"
 """
 
-def get_labels_for_issue(title: str, body: str = "") -> list:
-    """Determine labels based on keywords in title/body."""
-    text = f"{title or ""} {body or ""}".lower()
-    # Fixed version avoids nested quote issue:
-    # text = ((title or "") + " " + (body or "")).lower()
-    # Recompute correctly:
+def get_labels_for_issue(title, body=""):
     text = ((title or "") + " " + (body or "")).lower()
     labels = []
     if "error" in text:
