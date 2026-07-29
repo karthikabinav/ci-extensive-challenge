@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
 """
-Auto-label GitHub issues by keyword.
+Auto-label script for GitHub issues
+Labels new issues by keyword:
 - label "bug" if the issue contains "error"
-- label "feature" if it contains "add"
+- label "feature" if the issue contains "add"
 """
 
-def get_labels(title, body=""):
+def get_labels(title: str, body: str = "") -> list:
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -13,22 +15,12 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
-# Example GitHub Actions integration (using github-script style logic)
-# This function would be called by the workflow when a new issue is opened.
-# In real automation, you would use:
-#   github.rest.issues.addLabels({
-#       owner: context.repo.owner,
-#       repo: context.repo.repo,
-#       issue_number: context.issue.number,
-#       labels: get_labels(issue.title, issue.body)
-#   })
-
+# Example usage for testing
 if __name__ == "__main__":
-    # Simple test with the three sample issues
     test_cases = [
         "error test",
         "feature adding requirements",
         "email feature adding error"
     ]
     for title in test_cases:
-        print(f"{title}: {get_labels(title)}")
+        print(f"Title: \"{title}\" -> Labels: {get_labels(title)}")
