@@ -6,6 +6,8 @@ on:
 jobs:
   label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Label by keyword
         uses: actions/github-script@v6
