@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Label bug if contains error
-        if: contains(github.event.issue.title, error) || contains(github.event.issue.body, error)
+        if: "contains(github.event.issue.title, error) || contains(github.event.issue.body, error)"
         uses: actions/github-script@v7
         with:
           script: |
@@ -20,7 +20,7 @@ jobs:
               labels: ["bug"]
             })
       - name: Label feature if contains add
-        if: contains(github.event.issue.title, add) || contains(github.event.issue.body, add)
+        if: "contains(github.event.issue.title, add) || contains(github.event.issue.body, add)"
         uses: actions/github-script@v7
         with:
           script: |
