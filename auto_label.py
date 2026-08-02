@@ -1,12 +1,6 @@
-#!/usr/bin/env python3
-"""
-Auto-label script for GitHub issues
-Labels new issues by keyword:
-- label "bug" if the issue contains "error"
-- label "feature" if the issue contains "add"
-"""
+import re
 
-def get_labels(title: str, body: str = "") -> list:
+def get_labels(title, body=""):
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -15,12 +9,10 @@ def get_labels(title: str, body: str = "") -> list:
         labels.append("feature")
     return labels
 
-# Example usage for testing
 if __name__ == "__main__":
-    test_cases = [
-        "error test",
-        "feature adding requirements",
-        "email feature adding error"
-    ]
-    for title in test_cases:
-        print(f"Title: \"{title}\" -> Labels: {get_labels(title)}")
+    # Example usage for GitHub automation
+    # This script is intended to be used in a GitHub Action to label issues
+    import os
+    title = os.getenv("ISSUE_TITLE", "")
+    body = os.getenv("ISSUE_BODY", "")
+    print(get_labels(title, body))
