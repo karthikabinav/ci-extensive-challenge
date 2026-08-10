@@ -1,22 +1,12 @@
-import re
-# Auto-label script for GitHub issues
-# Labels "bug" if issue contains "error", "feature" if contains "add"
-
-def get_labels(title, body=""):
-    text = f"{title} {body}".lower()
+def label_issue(title):
+    t = title.lower()
     labels = []
-    if "error" in text:
+    if "error" in t:
         labels.append("bug")
-    if "add" in text:
+    if "add" in t:
         labels.append("feature")
     return labels
 
-# Example usage
-if __name__ == "__main__":
-    test_cases = [
-        "error test",
-        "feature adding requirements",
-        "email feature adding error"
-    ]
-    for t in test_cases:
-        print(f"{t}: {get_labels(t)}")
+print(label_issue("error test"))
+print(label_issue("feature adding requirements"))
+print(label_issue("email feature adding error"))
