@@ -1,0 +1,27 @@
+name: Final Project Auto Label
+on:
+  issues:
+    types: [opened]
+jobs:
+  auto-label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Label issues by keyword
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const content = (issue.title + " " + (issue.body || "")).toLowerCase();
+            let labels = [];
+            if (content.includes("error")) labels.push("bug");
+            if (content.includes("add")) labels.push("feature");
+            if (labels.length) {
+              github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels
+              });
+            }
