@@ -1,9 +1,6 @@
-# Auto Label Script
-# Automatically labels issues by keyword
-# label "bug" if issue contains "error"
-# label "feature" if issue contains "add"
+import re
 
-def get_labels(title, body=""):
+def label_issue(title, body=""):
     text = (title + " " + body).lower()
     labels = []
     if "error" in text:
@@ -12,8 +9,7 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
-# Test cases
-if __name__ == "__main__":
-    tests = ["error test", "feature adding requirements", "email feature adding error"]
-    for t in tests:
-        print(t, "->", get_labels(t))
+# Example usage:
+# label_issue("error test") => ["bug"]
+# label_issue("feature adding requirements") => ["feature"]
+# label_issue("email feature adding error") => ["bug", "feature"]
