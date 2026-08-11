@@ -1,3 +1,35 @@
-# CI Extensive Challenge
+name: Auto Label Issues
+on:
+  issues:
+    types: [opened, edited]
 
-A repository to test complex GitHub automation workflows.
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Label issue based on keywords
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = (issue.title || "").toLowerCase();
+            const body = (issue.body || "").toLowerCase();
+            const text = title + " " + body;
+            const labels = [];
+            if (text.includes("error")) {
+              labels.push("bug");
+            }
+            if (text.includes("add")) {
+              labels.push("feature");
+            }
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+            }
