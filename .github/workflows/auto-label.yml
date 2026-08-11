@@ -16,11 +16,11 @@ jobs:
             const body = (context.payload.issue.body || "").toLowerCase();
             const content = title + " " + body;
             const labels = [];
-            if (content.includes(error)) {
-              labels.push(bug);
+            if (content.includes('error')) {
+              labels.push('bug');
             }
-            if (content.includes(add)) {
-              labels.push(feature);
+            if (content.includes('add')) {
+              labels.push('feature');
             }
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
