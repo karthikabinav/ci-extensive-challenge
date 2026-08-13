@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
 """
-Auto Label Issues by Keyword
-This script automatically labels new GitHub issues based on keywords in title/body.
-- If issue contains "error" -> add label "bug"
-- If issue contains "add" -> add label "feature"
-Usage: intended for GitHub Actions workflow triggered on issues: opened
+Auto-label GitHub issues by keyword
+- label "bug" if issue contains "error"
+- label "feature" if issue contains "add"
 """
 import os
+import re
+import sys
 
 def get_labels(title, body=""):
     text = f"{title} {body}".lower()
@@ -17,10 +18,11 @@ def get_labels(title, body=""):
     return labels
 
 if __name__ == "__main__":
-    tests = [
-        "error test",
-        "feature adding requirements",
-        "email feature adding error"
+    # Example usage for testing
+    test_cases = [
+        ("error test", ""),
+        ("feature adding requirements", ""),
+        ("email feature adding error", "")
     ]
-    for t in tests:
-        print(t, "=>", get_labels(t))
+    for title, body in test_cases:
+        print(title, "->", get_labels(title, body))
