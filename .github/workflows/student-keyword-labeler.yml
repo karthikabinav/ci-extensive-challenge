@@ -1,8 +1,7 @@
-name: Keyword Issue Auto Labeler
+name: Student Keyword Labeler
 on:
   issues:
     types: [opened]
-
 jobs:
   auto-label:
     runs-on: ubuntu-latest
@@ -15,14 +14,16 @@ jobs:
           script: |
             const title = context.payload.issue.title.toLowerCase();
             const body = (context.payload.issue.body || "").toLowerCase();
-            const content = `${title} ${body}`;
+            const text = title + " " + body;
             const labels = [];
-            if (content.includes("error")) {
+            
+            if (text.includes("error")) {
               labels.push("bug");
             }
-            if (content.includes("add")) {
+            if (text.includes("add")) {
               labels.push("feature");
             }
+            
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
@@ -31,4 +32,6 @@ jobs:
                 labels: labels
               });
               console.log(`Added labels: ${labels.join(", ")}`);
+            } else {
+              console.log("No matching keywords found");
             }
