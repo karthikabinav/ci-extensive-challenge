@@ -1,4 +1,5 @@
-import sys
+import os
+import requests
 
 def get_labels(title, body=""):
     text = f"{title} {body}".lower()
@@ -9,7 +10,15 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
+def label_issue(owner, repo, issue_number, token):
+    # Example function to label via GitHub API
+    url = f"https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/labels"
+    labels = get_labels(issue_title)  # placeholder
+    headers = {"Authorization": f"token {token}"}
+    requests.post(url, json={"labels": labels}, headers=headers)
+
 if __name__ == "__main__":
-    title = sys.argv[1] if len(sys.argv) > 1 else ""
-    body = sys.argv[2] if len(sys.argv) > 2 else ""
-    print(",".join(get_labels(title, body)))
+    # Example usage for local testing
+    tests = ["error test", "feature adding requirements", "email feature adding error"]
+    for t in tests:
+        print(f"{t} -> {get_labels(t)}")
