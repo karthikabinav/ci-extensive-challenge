@@ -11,14 +11,12 @@ def get_labels(title, body=""):
     return labels
 
 def label_issue(owner, repo, issue_number, token):
-    # Example function to label via GitHub API
     url = f"https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/labels"
-    labels = get_labels(issue_title)  # placeholder
+    labels = get_labels(issue_title)
     headers = {"Authorization": f"token {token}"}
     requests.post(url, json={"labels": labels}, headers=headers)
 
 if __name__ == "__main__":
-    # Example usage for local testing
     tests = ["error test", "feature adding requirements", "email feature adding error"]
     for t in tests:
         print(f"{t} -> {get_labels(t)}")
