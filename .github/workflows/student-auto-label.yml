@@ -1,4 +1,4 @@
-name: Student Auto Label
+name: Auto Label Issues by Keyword
 
 on:
   issues:
