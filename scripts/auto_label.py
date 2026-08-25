@@ -1,12 +1,12 @@
-#!/usr/bin/env python3
 """
-Auto-label script for GitHub issues.
-Labels "bug" if text contains "error", "feature" if contains "add"
+Auto-label issues by keyword.
+- label "bug" if issue title/body contains "error" (case-insensitive)
+- label "feature" if issue title/body contains "add" (case-insensitive)
+This logic mirrors .github/workflows/auto-label.yml
 """
-import sys
 
-def get_labels(title: str, body: str = ""):
-    text = f"{title} {body}".lower()
+def get_labels_for_issue(title: str, body: str = "") -> list:
+    text = f"{title or ""} {body or ""}".lower()
     labels = []
     if "error" in text:
         labels.append("bug")
@@ -15,7 +15,11 @@ def get_labels(title: str, body: str = ""):
     return labels
 
 if __name__ == "__main__":
-    # Example usage: python auto_label.py "error test"
-    title = sys.argv[1] if len(sys.argv) > 1 else ""
-    body = sys.argv[2] if len(sys.argv) > 2 else ""
-    print(get_labels(title, body))
+    # Simple test harness for the three sample issues
+    samples = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for s in samples:
+        print(f"{s!r} -> {get_labels_for_issue(s)}")
