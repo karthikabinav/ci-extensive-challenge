@@ -1,7 +1,7 @@
 """
-Auto-label issues by keyword.
-- label "bug" if issue contains "error"
-- label "feature" if issue contains "add"
+Auto-label new issues by keyword:
+- label "bug" if issue title/body contains "error"
+- label "feature" if issue title/body contains "add"
 """
 
 def get_labels(title: str, body: str = "") -> list:
@@ -13,6 +13,6 @@ def get_labels(title: str, body: str = "") -> list:
         labels.append("feature")
     return labels
 
-# Example usage for GitHub automation (e.g., in Actions or webhook handler):
+# Example usage:
 # labels = get_labels(issue_title, issue_body)
 # then apply labels via GitHub API
