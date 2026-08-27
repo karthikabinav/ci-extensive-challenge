@@ -1,7 +1,11 @@
-import os
-import requests
+"""
+Auto-label script for GitHub issues.
+Labels new issues by keyword:
+- label "bug" if the issue contains "error"
+- label "feature" if it contains "add"
+"""
 
-def get_labels(title, body=""):
+def get_labels_for_issue(title: str, body: str = "") -> list:
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -10,18 +14,15 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
-def label_issue(owner, repo, issue_number, title, body="", token=None):
-    token = token or os.getenv("GITHUB_TOKEN")
-    labels = get_labels(title, body)
-    if not labels:
-        return labels
-    url = f"https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/labels"
-    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github+json"}
-    # In real automation, uncomment:
-    # requests.post(url, json={"labels": labels}, headers=headers)
-    return labels
+# Example usage:
+# labels = get_labels_for_issue(issue_title, issue_body)
+# then apply via GitHub API: update_issue with labels
 
 if __name__ == "__main__":
-    tests = ["error test", "feature adding requirements", "email feature adding error"]
-    for t in tests:
-        print(f"{t} -> {get_labels(t)}")
+    test_cases = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for t in test_cases:
+        print(f"{t!r} -> {get_labels_for_issue(t)}")
