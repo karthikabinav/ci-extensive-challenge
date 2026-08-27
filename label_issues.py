@@ -10,11 +10,16 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
-def label_issue(owner, repo, issue_number, token):
+def label_issue(owner, repo, issue_number, title, body="", token=None):
+    token = token or os.getenv("GITHUB_TOKEN")
+    labels = get_labels(title, body)
+    if not labels:
+        return labels
     url = f"https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/labels"
-    labels = get_labels(issue_title)
-    headers = {"Authorization": f"token {token}"}
-    requests.post(url, json={"labels": labels}, headers=headers)
+    headers = {"Authorization": f"token {token}", "Accept": "application/vnd.github+json"}
+    # In real automation, uncomment:
+    # requests.post(url, json={"labels": labels}, headers=headers)
+    return labels
 
 if __name__ == "__main__":
     tests = ["error test", "feature adding requirements", "email feature adding error"]
