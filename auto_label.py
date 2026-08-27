@@ -1,18 +1,15 @@
-"""
-Auto-label new issues by keyword:
-- label "bug" if issue title/body contains "error"
-- label "feature" if issue title/body contains "add"
-"""
+import re
 
-def get_labels(title: str, body: str = "") -> list:
-    text = f"{title} {body}".lower()
+def get_labels(title: str):
+    """Automatically label issues by keyword using whole-word matching."""
     labels = []
-    if "error" in text:
+    # Use word boundaries to avoid substring false positives (e.g. adding != add)
+    if re.search(r"\berror\b", title, re.IGNORECASE):
         labels.append("bug")
-    if "add" in text:
+    if re.search(r"\badd\b", title, re.IGNORECASE):
         labels.append("feature")
     return labels
 
 # Example usage:
-# labels = get_labels(issue_title, issue_body)
-# then apply labels via GitHub API
+# labels = get_labels(issue_title)
+# then apply via GitHub API update_issue
