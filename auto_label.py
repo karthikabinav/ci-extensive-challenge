@@ -1,7 +1,11 @@
-"""Automatically label issues by keyword:\n- label bug if text contains error\n- label feature if text contains add\n"""
+"""
+Auto-label issues by keyword.
+- label "bug" if issue contains "error"
+- label "feature" if issue contains "add"
+"""
 
-def get_labels(title: str, body: str = "") -> list:
-    text = f"{title} {body}".lower()
+def get_labels(title, body=""):
+    text = (title + " " + (body or "")).lower()
     labels = []
     if "error" in text:
         labels.append("bug")
@@ -9,7 +13,6 @@ def get_labels(title: str, body: str = "") -> list:
         labels.append("feature")
     return labels
 
-if __name__ == "__main__":
-    tests = ["error test", "feature adding requirements", "email feature adding error"]
-    for t in tests:
-        print(f"{t!r} -> {get_labels(t)}")
+# Example usage with MCP tools:
+# For each new issue, call get_labels(issue_title, issue_body)
+# then use update_issue with the returned labels to apply them.
