@@ -1,11 +1,8 @@
-"""
-Auto-label issues by keyword.
-- label "bug" if issue contains "error"
-- label "feature" if issue contains "add"
-"""
+# Auto-label script
+# Labels new issues by keyword: "bug" if contains "error", "feature" if contains "add"
 
-def get_labels(title, body=""):
-    text = (title + " " + (body or "")).lower()
+def get_labels(title: str, body: str = ""):
+    text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
         labels.append("bug")
@@ -13,6 +10,6 @@ def get_labels(title, body=""):
         labels.append("feature")
     return labels
 
-# Example usage with MCP tools:
-# For each new issue, call get_labels(issue_title, issue_body)
-# then use update_issue with the returned labels to apply them.
+# Example usage:
+# labels = get_labels(issue_title, issue_body)
+# then apply labels via GitHub API
