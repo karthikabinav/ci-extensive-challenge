@@ -1,20 +1,27 @@
 """
 Auto-label issues by keyword.
-- label "bug" if issue title/body contains "error"
-- label "feature" if issue title/body contains "add"
-Case-insensitive substring matching.
+- label "bug" if issue contains "error"
+- label "feature" if issue contains "add"
 """
 
-def get_labels(text: str):
-    text_lower = text.lower()
+def get_labels(title: str, body: str = "") -> list:
+    text = f"{title} {body}".lower()
     labels = []
-    if "error" in text_lower:
+    if "error" in text:
         labels.append("bug")
-    if "add" in text_lower:
+    if "add" in text:
         labels.append("feature")
     return labels
 
+# Example usage with MCP tools:
+# For each new issue, call get_labels(issue_title, issue_body)
+# then update_issue with returned labels.
+
 if __name__ == "__main__":
-    import sys
-    title = sys.argv[1] if len(sys.argv) > 1 else ""
-    print(get_labels(title))
+    test_cases = [
+        ("error test", ""),
+        ("feature adding requirements", ""),
+        ("email feature adding error", ""),
+    ]
+    for title, body in test_cases:
+        print(f"{title!r} -> {get_labels(title, body)}")
