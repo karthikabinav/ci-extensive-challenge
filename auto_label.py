@@ -1,15 +1,21 @@
-# Auto-label script
-# Labels new issues by keyword: "bug" if contains "error", "feature" if contains "add"
+# Auto-label issues by keyword
+# Labels new issues: "bug" if title contains "error", "feature" if contains "add"
 
-def get_labels(title: str, body: str = ""):
-    text = f"{title} {body}".lower()
+def get_labels(title: str):
     labels = []
-    if "error" in text:
+    title_lower = title.lower()
+    if "error" in title_lower:
         labels.append("bug")
-    if "add" in text:
+    if "add" in title_lower:
         labels.append("feature")
     return labels
 
-# Example usage:
-# labels = get_labels(issue_title, issue_body)
-# then apply labels via GitHub API
+if __name__ == "__main__":
+    # Example usage / test
+    test_titles = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error"
+    ]
+    for t in test_titles:
+        print(f"{t!r} -> {get_labels(t)}")
