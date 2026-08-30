@@ -1,24 +1,15 @@
-"""
-Auto-label issues by keyword.
-- label "bug" if issue text contains "error"
-- label "feature" if issue text contains "add"
-"""
+"""Auto-label issues by keyword: bug if contains error, feature if contains add."""
 
-def get_labels(title: str, body: str = "") -> list:
-    text = f"{title} {body}".lower()
+def get_labels(title: str):
+    t = title.lower()
     labels = []
-    if "error" in text:
+    if "error" in t:
         labels.append("bug")
-    if "add" in text:
+    if "add" in t:
         labels.append("feature")
     return labels
 
 if __name__ == "__main__":
-    # Simple manual test for the three sample issues
-    samples = [
-        "error test",
-        "feature adding requirements",
-        "email feature adding error",
-    ]
-    for s in samples:
-        print(f"{s!r} -> {get_labels(s)}")
+    tests = ["error test", "feature adding requirements", "email feature adding error"]
+    for title in tests:
+        print(f"{title!r} -> {get_labels(title)}")
