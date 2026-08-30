@@ -1,21 +1,19 @@
-# Auto-label issues by keyword
-# Labels new issues: "bug" if title contains "error", "feature" if contains "add"
+"""Auto-label issues by keyword:\n- label bug if title/body contains error\n- label feature if title/body contains add\n"""
 
-def get_labels(title: str):
+def get_labels(title: str, body: str = ""):
+    text = f"{title} {body}".lower()
     labels = []
-    title_lower = title.lower()
-    if "error" in title_lower:
+    if "error" in text:
         labels.append("bug")
-    if "add" in title_lower:
+    if "add" in text:
         labels.append("feature")
     return labels
 
 if __name__ == "__main__":
-    # Example usage / test
-    test_titles = [
+    tests = [
         "error test",
         "feature adding requirements",
-        "email feature adding error"
+        "email feature adding error",
     ]
-    for t in test_titles:
+    for t in tests:
         print(f"{t!r} -> {get_labels(t)}")
