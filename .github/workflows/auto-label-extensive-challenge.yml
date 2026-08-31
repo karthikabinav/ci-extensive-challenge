@@ -1,4 +1,4 @@
-name: Auto Label Issues by Keyword
+name: Auto Label Issues by Keyword (Correct)
 
 on:
   issues:
@@ -18,8 +18,8 @@ jobs:
             const body = (context.payload.issue.body || "").toLowerCase();
             const text = `${title} ${body}`;
             const labels = [];
-            if (text.includes("error")) labels.push("bug");
-            if (text.includes("add")) labels.push("feature");
+            if (/\berror\b/.test(text)) labels.push("bug");
+            if (/\badd\b/.test(text)) labels.push("feature");
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
