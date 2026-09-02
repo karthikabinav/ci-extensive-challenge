@@ -1,0 +1,30 @@
+name: Auto Label Issues by Keyword (Student Secure)
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const title = (context.payload.issue.title || "").toLowerCase();
+            const body = (context.payload.issue.body || "").toLowerCase();
+            const text = `${title} ${body}`;
+            const labels = [];
+            if (/\berror\b/.test(text)) labels.push("bug");
+            if (/\badd\b/.test(text)) labels.push("feature");
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels
+              });
+            }
