@@ -1,24 +1,33 @@
 """
-Auto-label issues by keyword.
-- label "bug" if issue contains "error"
-- label "feature" if issue contains "add"
-Case-insensitive matching on title+body.
+Secure auto-label script for GitHub issues.
+
+Rules:
+- label "bug" if issue title/body contains whole word "error" (case-insensitive, regex \\berror\\b)
+- label "feature" if issue title/body contains whole word "add" (regex \\badd\\b)
+
+Uses word boundaries to avoid false positives from naive substring matching
+(e.g., "adding" should NOT trigger "add", "terror" should NOT trigger "error").
 """
+import re
 
 def get_labels(title: str, body: str = "") -> list:
-    text = f"{title} {body}".lower()
+    text = f"{title} {body}"
     labels = []
-    if "error" in text:
+    if re.search(r"\berror\b", text, re.IGNORECASE):
         labels.append("bug")
-    if "add" in text:
+    if re.search(r"\badd\b", text, re.IGNORECASE):
         labels.append("feature")
     return labels
 
-if __name__ == "__main__":
-    tests = [
+def main():
+    # Example usage for testing
+    test_cases = [
         "error test",
         "feature adding requirements",
         "email feature adding error",
     ]
-    for t in tests:
-        print(f"{t!r} -> {get_labels(t)}")
+    for title in test_cases:
+        print(f"{title!r} => {get_labels(title)}")
+
+if __name__ == "__main__":
+    main()
