@@ -1,1 +1,22 @@
-"""\nLabel GitHub issues by keyword with precise word-boundary matching.\n- label bug if issue title/body contains whole word error (case-insensitive)\n- label feature if issue title/body contains whole word add (case-insensitive)\nUses word boundaries to avoid false positives like adding matching add.\n"""\nimport re\n\ndef get_labels(title: str, body: str = "") -> list:\n    text = (title + " " + (body or "")).lower()\n    labels = []\n    if re.search(r"\\berror\\b", text):\n        labels.append("bug")\n    if re.search(r"\\badd\\b", text):\n        labels.append("feature")\n    return labels\n\nif __name__ == "__main__":\n    tests = [\n        "error test",\n        "feature adding requirements",\n        "email feature adding error",\n    ]\n    for t in tests:\n        print(t + " -> " + str(get_labels(t)))\n
+"""
+Auto-label issues by keyword:
+- label "bug" if text contains "error"
+- label "feature" if text contains "add"
+"""
+def get_labels(title: str, body: str = "") -> list:
+    text = (title + " " + body).lower()
+    labels = []
+    if "error" in text:
+        labels.append("bug")
+    if "add" in text:
+        labels.append("feature")
+    return labels
+
+if __name__ == "__main__":
+    tests = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for t in tests:
+        print(f"{t!r} -> {get_labels(t)}")
