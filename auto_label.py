@@ -1,4 +1,10 @@
-def get_labels(title: str, body: str = ""):
+"""
+Auto-label issues by keyword.
+- label "bug" if issue text contains "error"
+- label "feature" if issue text contains "add"
+"""
+
+def get_labels(title: str, body: str = "") -> list[str]:
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -7,9 +13,10 @@ def get_labels(title: str, body: str = ""):
         labels.append("feature")
     return labels
 
+
 if __name__ == "__main__":
-    # Example usage for GitHub automation
     import sys
+    # Simple CLI for testing: python auto_label.py "<title>" "<body>"
     title = sys.argv[1] if len(sys.argv) > 1 else ""
     body = sys.argv[2] if len(sys.argv) > 2 else ""
     print(get_labels(title, body))
