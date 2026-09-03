@@ -1,8 +1,8 @@
 """
-Automatic issue labeling script.
-Labels new issues by keyword:
-- label "bug" if the issue contains "error"
-- label "feature" if it contains "add"
+Auto-label issues by keyword.
+- label "bug" if issue contains "error"
+- label "feature" if issue contains "add"
+Case-insensitive matching on title+body.
 """
 
 def get_labels(title: str, body: str = "") -> list:
@@ -14,12 +14,11 @@ def get_labels(title: str, body: str = "") -> list:
         labels.append("feature")
     return labels
 
-
 if __name__ == "__main__":
-    test_cases = [
-        ("error test", ""),
-        ("feature adding requirements", ""),
-        ("email feature adding error", ""),
+    tests = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
     ]
-    for title, body in test_cases:
-        print(f"{title!r} -> {get_labels(title, body)}")
+    for t in tests:
+        print(f"{t!r} -> {get_labels(t)}")
