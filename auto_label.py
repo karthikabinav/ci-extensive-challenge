@@ -1,10 +1,7 @@
-"""
-Auto-label issues by keyword.
-- label "bug" if issue text contains "error"
-- label "feature" if issue text contains "add"
-"""
+# Auto-label issues by keyword
+# Labels new issues: "bug" if title/body contains "error", "feature" if contains "add"
 
-def get_labels(title: str, body: str = "") -> list[str]:
+def get_labels(title: str, body: str = ""):
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -13,10 +10,9 @@ def get_labels(title: str, body: str = "") -> list[str]:
         labels.append("feature")
     return labels
 
-
+# Example usage with GitHub API:
+# for each new issue, call get_labels(issue_title, issue_body) and apply labels via API
 if __name__ == "__main__":
-    import sys
-    # Simple CLI for testing: python auto_label.py "<title>" "<body>"
-    title = sys.argv[1] if len(sys.argv) > 1 else ""
-    body = sys.argv[2] if len(sys.argv) > 2 else ""
-    print(get_labels(title, body))
+    tests = ["error test", "feature adding requirements", "email feature adding error"]
+    for t in tests:
+        print(t, "->", get_labels(t))
