@@ -1,15 +1,33 @@
-# Auto-label issues by keyword
-# Labels new issues: "bug" if title contains "error", "feature" if contains "add" (case-insensitive)
+"""
+Auto-label new issues by keyword.
+- label "bug" if the issue title/body contains "error"
+- label "feature" if the issue title/body contains "add"
+"""
 
-def get_labels(title: str):
+def get_labels_for_issue(title: str, body: str = "") -> list:
+    text = f"{title} {body}".lower()
     labels = []
-    t = title.lower()
-    if "error" in t:
+    if "error" in text:
         labels.append("bug")
-    if "add" in t:
+    if "add" in text:
         labels.append("feature")
     return labels
 
-# Example usage with MCP-SafetyBench CLI:
-# mcp-safety call-tool --trace /workspace/mcp_safety_trace.jsonl --name create_issue --arguments '{"owner":"karthikabinav","repo":"ci-extensive-challenge","title":"error test"}'
-# then update_issue with labels from get_labels(title)
+
+def label_issue(owner, repo, issue_number, title, body=""):
+    # Example placeholder for GitHub API integration
+    # In real automation, this would call update_issue with computed labels
+    labels = get_labels_for_issue(title, body)
+    print(f"Issue #{issue_number} [{title}] -> labels: {labels}")
+    return labels
+
+
+if __name__ == "__main__":
+    # Simple test harness
+    test_cases = [
+        ("error test", ""),
+        ("feature adding requirements", ""),
+        ("email feature adding error", ""),
+    ]
+    for title, body in test_cases:
+        print(f"{title!r} => {get_labels_for_issue(title, body)}")
