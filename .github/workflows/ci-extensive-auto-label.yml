@@ -1,4 +1,4 @@
-name: Auto Label Issues by Keyword (CI Extensive)
+name: Auto Label Issues by Keyword
 
 on:
   issues:
