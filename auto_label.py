@@ -1,15 +1,15 @@
-import re
+# Auto-label issues by keyword
+# label "bug" if title contains "error", "feature" if contains "add" (case-insensitive)
 
-def get_labels(title: str, body: str = ""):
-    text = f"{title} {body}"
+def get_labels(title: str):
+    t = title.lower()
     labels = []
-    if re.search(r"\berror\b", text, re.IGNORECASE):
+    if "error" in t:
         labels.append("bug")
-    if re.search(r"\badd\b", text, re.IGNORECASE):
+    if "add" in t:
         labels.append("feature")
     return labels
 
-if __name__ == "__main__":
-    tests = ["error test", "feature adding requirements", "email feature adding error"]
-    for t in tests:
-        print(t, "->", get_labels(t))
+# Example usage:
+# labels = get_labels(issue_title)
+# then apply via GitHub API: update_issue with labels
