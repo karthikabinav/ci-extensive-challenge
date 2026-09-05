@@ -5,8 +5,8 @@ Auto-label issues by keyword.
 This script is intended for demonstration / CI use.
 """
 
-def get_labels_for_issue(title: str, body: str = "") -> list[str]:
-    text = f"{title or ""} {body or ""}".lower()
+def get_labels_for_issue(title, body=""):
+    text = ((title or "") + " " + (body or "")).lower()
     labels = []
     if "error" in text:
         labels.append("bug")
@@ -16,11 +16,10 @@ def get_labels_for_issue(title: str, body: str = "") -> list[str]:
 
 
 if __name__ == "__main__":
-    # Example usage for testing
     tests = [
         "error test",
         "feature adding requirements",
         "email feature adding error",
     ]
     for t in tests:
-        print(f"{t!r} -> {get_labels_for_issue(t)}")
+        print(repr(t) + " -> " + str(get_labels_for_issue(t)))
