@@ -1,34 +1,24 @@
 """
-Auto-label issues by keyword with robust word-boundary matching.
-
-Rules:
-- label "bug" if issue title/body contains whole word "error" (case-insensitive)
-- label "feature" if issue title/body contains whole word "add" (case-insensitive)
-
-Uses regex word boundaries (\\b) to avoid false positives:
-- "adding" should NOT trigger "add"
-- "errors" should NOT trigger "error" (plural)
-- "terror" should NOT trigger "error"
+Auto-label script: labels new issues by keyword.
+- label "bug" if issue contains "error" (case-insensitive)
+- label "feature" if issue contains "add" (case-insensitive)
 """
-import re
 
-def get_labels(title: str, body: str = "") -> list[str]:
-    text = f"{title} {body}"
+def get_labels(title: str, body: str = "") -> list:
+    text = f"{title} {body}".lower()
     labels = []
-    if re.search(r"\berror\b", text, re.IGNORECASE):
+    if "error" in text:
         labels.append("bug")
-    if re.search(r"\badd\b", text, re.IGNORECASE):
+    if "add" in text:
         labels.append("feature")
     return labels
 
-def test_examples():
-    cases = [
-        ("error test", ""),
-        ("feature adding requirements", ""),
-        ("email feature adding error", ""),
-    ]
-    for title, body in cases:
-        print(f"{title!r} -> {get_labels(title, body)}")
-
 if __name__ == "__main__":
-    test_examples()
+    # Example usage / test cases
+    tests = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for t in tests:
+        print(f"{t!r} -> {get_labels(t)}")
