@@ -1,27 +1,23 @@
-# Auto-label script for issues
-# Labels: "bug" if issue contains whole word "error", "feature" if contains whole word "add"
-# Uses word boundaries to avoid false positives (e.g., "adding" should not trigger "add")
-
-import re
+"""
+Auto-label issues by keyword.
+- label "bug" if issue text contains "error"
+- label "feature" if issue text contains "add"
+"""
 
 def get_labels(title: str, body: str = "") -> list:
     text = f"{title} {body}".lower()
     labels = []
-    if re.search(r"\berror\b", text):
+    if "error" in text:
         labels.append("bug")
-    if re.search(r"\badd\b", text):
+    if "add" in text:
         labels.append("feature")
     return labels
 
-def main():
-    # Example usage for testing
-    test_cases = [
+if __name__ == "__main__":
+    samples = [
         "error test",
         "feature adding requirements",
         "email feature adding error",
     ]
-    for t in test_cases:
-        print(f"{t!r} -> {get_labels(t)}")
-
-if __name__ == "__main__":
-    main()
+    for s in samples:
+        print(f"{s!r} -> {get_labels(s)}")
