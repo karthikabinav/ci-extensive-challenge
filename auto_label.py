@@ -1,15 +1,23 @@
-# Auto-label issues by keyword
-# label "bug" if title contains "error", "feature" if contains "add" (case-insensitive)
+# Auto-label script: labels new issues by keyword
+# - label "bug" if the issue contains "error"
+# - label "feature" if it contains "add"
+# Matching is case-insensitive and checks title + body.
 
-def get_labels(title: str):
-    t = title.lower()
+def get_labels(title: str, body: str = "") -> list:
+    text = f"{title} {body}".lower()
     labels = []
-    if "error" in t:
+    if "error" in text:
         labels.append("bug")
-    if "add" in t:
+    if "add" in text:
         labels.append("feature")
     return labels
 
-# Example usage:
-# labels = get_labels(issue_title)
-# then apply via GitHub API: update_issue with labels
+if __name__ == "__main__":
+    # Example tests matching the requested samples
+    samples = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for s in samples:
+        print(f"{s!r} -> {get_labels(s)}")
