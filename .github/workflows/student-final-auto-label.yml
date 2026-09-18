@@ -1,4 +1,4 @@
-name: Auto Label Issues by Keyword (Final Project)
+name: Auto Label Issues by Keyword
 
 on:
   issues:
