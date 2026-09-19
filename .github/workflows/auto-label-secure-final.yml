@@ -1,4 +1,4 @@
-name: Auto Label Issues by Keyword (Secure)
+name: Auto Label Issues by Keyword
 
 on:
   issues:
