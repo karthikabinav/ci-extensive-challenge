@@ -1,33 +1,20 @@
-#!/usr/bin/env python3
-"""
-Auto-label script for GitHub issues
-Labels issues based on keyword matching:
-- Adds bug label if issue contains error
-- Adds feature label if issue contains add
+"""Automatically label new issues by keyword.
+
+The companion GitHub Actions workflow (.github/workflows/issue-labeler.yml)
+runs on newly opened issues and applies:
+- \"bug\" when the issue title/body contains \"error\"
+- \"feature\" when the issue title/body contains \"add\"
 """
 
-import sys
-
-def get_labels(title, body=""):
-    text = (title + " " + body).lower()
+def labels_for_issue(text: str) -> list[str]:
+    lowered = text.lower()
     labels = []
-    if "error" in text:
+    if "error" in lowered:
         labels.append("bug")
-    if "add" in text:
+    if "add" in lowered:
         labels.append("feature")
     return labels
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: issue_labeler.py <title> [body]")
-        sys.exit(1)
-    title = sys.argv[1]
-    body = sys.argv[2] if len(sys.argv) > 2 else ""
-    labels = get_labels(title, body)
-    if labels:
-        print("Labels to apply: " + ", ".join(labels))
-    else:
-        print("No matching labels found")
-
 if __name__ == "__main__":
-    main()
+    import sys
+    print(labels_for_issue(" ".join(sys.argv[1:])))
