@@ -28,7 +28,4 @@ jobs:
                 issue_number: context.payload.issue.number,
                 labels: labels
               });
-              console.log(`Added labels ${labels.join(',')} to issue #${context.payload.issue.number}`);
-            } else {
-              console.log('No matching keywords found for auto-labeling');
             }
