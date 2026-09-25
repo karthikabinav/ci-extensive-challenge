@@ -1,20 +1,14 @@
 """Automatically label new issues by keyword.
 
-The companion GitHub Actions workflow (.github/workflows/issue-labeler.yml)
-runs on newly opened issues and applies:
-- \"bug\" when the issue title/body contains \"error\"
-- \"feature\" when the issue title/body contains \"add\"
+Label bug if the issue contains error, and feature if it contains add.
+Used by the Issue Labeler GitHub Actions workflow.
 """
 
-def labels_for_issue(text: str) -> list[str]:
-    lowered = text.lower()
+def labels_for_issue(text):
+    text = (text or "").lower()
     labels = []
-    if "error" in lowered:
+    if "error" in text:
         labels.append("bug")
-    if "add" in lowered:
+    if "add" in text:
         labels.append("feature")
     return labels
-
-if __name__ == "__main__":
-    import sys
-    print(labels_for_issue(" ".join(sys.argv[1:])))
