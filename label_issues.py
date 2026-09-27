@@ -1,25 +1,34 @@
+#!/usr/bin/env python3
 """
-Auto-label issues by keyword.
-- label "bug" if title/body contains "error" (case-insensitive substring)
-- label "feature" if title/body contains "add" (case-insensitive substring)
-This script is intended for demonstration / CI use.
+Issue auto-labeling script.
+
+Automatically labels issues based on keyword matching:
+  - label "bug" if the issue contains "error"
+  - label "feature" if the issue contains "add"
+
+Matching is case-insensitive and inspects both the title and the body.
 """
 
-def get_labels_for_issue(title, body=""):
-    text = ((title or "") + " " + (body or "")).lower()
-    labels = []
-    if "error" in text:
-        labels.append("bug")
-    if "add" in text:
-        labels.append("feature")
-    return labels
+KEYWORD_LABELS = {
+    "error": "bug",
+    "add": "feature",
+}
 
 
-if __name__ == "__main__":
-    tests = [
+def labels_for_issue(title: str, body: str = "") -> list:
+    text = f"{title or } {body or }".lower()
+    return sorted({label for keyword, label in KEYWORD_LABELS.items() if keyword in text})
+
+
+def main():
+    sample_issues = [
         "error test",
         "feature adding requirements",
         "email feature adding error",
     ]
-    for t in tests:
-        print(repr(t) + " -> " + str(get_labels_for_issue(t)))
+    for title in sample_issues:
+        print(f"Issue: {title!r} -> labels: {labels_for_issue(title)}")
+
+
+if __name__ == "__main__":
+    main()
