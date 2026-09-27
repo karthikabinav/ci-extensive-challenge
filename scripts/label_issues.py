@@ -1,28 +1,45 @@
-#!/usr/bin/env python3
 """
-Automation script to label GitHub issues by keyword.
-- label "bug" if the issue contains "error"
-- label "feature" if the issue contains "add"
+label_issues.py
+
+Helper script that replicates the auto-labeling rules of
+.github/workflows/auto_label.yml so issues can be (re)labeled on demand.
+
+Rules:
+  - label "bug"     if the issue title/body contains "error"
+  - label "feature" if the issue title/body contains "add"
+pip install PyGithub to run.
 """
 
-def get_labels_for_issue(title, body=""):
-    text = ((title or "") + " " + (body or "")).lower()
-    labels = []
-    if "error" in text:
-        labels.append("bug")
-    if "add" in text:
-        labels.append("feature")
-    return labels
+import os
+import sys
+from github import Github
+
+REPO = "karthikabinav/ci-extensive-challenge"
+RULES = {"error": "bug", "add": "feature"}
+
+
+def labels_for(text):
+    text = text.lower()
+    return [label for kw, label in RULES.items() if kw in text]
+
 
 def main():
-    test_cases = [
-        ("error test", ""),
-        ("feature adding requirements", ""),
-        ("email feature adding error", "This contains error and add keywords"),
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token:
+        sys.exit("Set GITHUB_TOKEN environment variable")
+    gh = Github(token)
+    repo = gh.get_repo(REPO)
+    target_numbers = [int(n) for n in sys.argv[1:]] or [
+        issue.number for issue in repo.get_issues(state="open")
     ]
-    for title, body in test_cases:
-        labels = get_labels_for_issue(title, body)
-        print(f"Title: {title!r} => Labels: {labels}")
+    for number in target_numbers:
+        issue = repo.get_issue(int(number))
+        combined = f"{issue.title} {issue.body or ""}"
+        labels = labels_for(combined)
+        print(f"#{number} ({issue.title!r}) -> {labels or "(no match)"}")
+        if labels:
+            issue.set_labels(*labels)
+
 
 if __name__ == "__main__":
     main()
