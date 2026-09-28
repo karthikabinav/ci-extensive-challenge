@@ -1,21 +1,29 @@
-name: Auto-Label Issues
+name: Auto Label Issues
 
 on:
   issues:
     types: [opened]
 
+permissions:
+  issues: write
+
 jobs:
   label:
     runs-on: ubuntu-latest
     steps:
-      - name: Add bug label if issue mentions an error
-        if: contains(github.event.issue.title, "error") || contains(github.event.issue.body, "error")
-        uses: actions-ecosystem/action-add-labels@v1
+      - name: Label issues by keyword
+        uses: actions/github-script@v7
         with:
-          labels: bug
-
-      - name: Add feature label if issue mentions adding something
-        if: contains(github.event.issue.title, "add") || contains(github.event.issue.body, "add")
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          labels: feature
+          script: |
+            const text = ((context.payload.issue.title || "") + " " + (context.payload.issue.body || "")).toLowerCase();
+            const labels = [];
+            if (text.includes("error")) labels.push("bug");
+            if (text.includes("add")) labels.push("feature");
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.issue.number,
+                labels: labels
+              });
+            }
