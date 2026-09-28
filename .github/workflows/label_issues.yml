@@ -1,0 +1,29 @@
+name: Auto Label Issues
+
+# Automatically label new issues by keyword:
+#   - contains "error" -> label "bug"
+#   - contains "add"   -> label "feature"
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Determine and apply labels
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TEXT: "${{ github.event.issue.title }} ${{ github.event.issue.body }}"
+        run: |
+          LABELS=$(python3 auto_labeler.py "$ISSUE_TEXT")
+          for label in $LABELS; do
+            gh issue edit "$ISSUE_NUMBER" --add-label "$label"
+          done
