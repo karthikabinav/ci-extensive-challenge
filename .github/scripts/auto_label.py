@@ -52,17 +52,22 @@ def determine_labels(*texts: str) -> list[str]:
     return [label for keyword, label in KEYWORD_LABELS.items() if keyword in combined]
 
 
-def api_request(method: str, url: str, token: str) -> list[dict]:
+def api_request(method: str, url: str, token: str, payload: list[str] | None = None) -> list[dict]:
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github+json",
         "User-Agent": "auto-label-issues-bot",
     }
-    request = urllib.request.Request(url, headers=headers, method=method)
+    data: bytes | None = None
+    if payload is not None:
+        data = json.dumps(payload).encode()
+        headers["Content-Type"] = "application/json"
+        headers["Content-Length"] = str(len(data))
+    request = urllib.request.Request(url, data=data, headers=headers, method=method)
     try:
         with urllib.request.urlopen(request) as response:
-            payload = response.read().decode()
-            return json.loads(payload) if payload else []
+            body = response.read().decode()
+            return json.loads(body) if body else []
     except urllib.error.HTTPError as error:
         print(f"GitHub API {method} {url} failed: {error.code} {error.reason}",
               file=sys.stderr)
@@ -95,8 +100,8 @@ def apply_labels() -> int:
         print(f"Issue #{issue_number}: labels already present, nothing to do.")
         return 0
 
-    # POST appends labels without removing existing ones.
-    api_request("POST", api, token)
+    # POST appends labels to the issue without removing existing ones.
+    api_request("POST", api, token, new_labels)
     print(f"Issue #{issue_number}: applied labels {new_labels}")
     return 0
 
