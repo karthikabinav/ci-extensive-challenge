@@ -1,11 +1,12 @@
 """
-Auto-label issues by keyword.
-- label "bug" if issue text contains "error"
-- label "feature" if issue text contains "add"
+Auto-label script: labels new issues by keyword.
+- if title/body contains "error" -> add label "bug"
+- if title/body contains "add" -> add label "feature"
+Matching is case-insensitive substring and both labels can apply.
 """
 
-def get_labels(title: str, body: str = "") -> list:
-    text = f"{title} {body}".lower()
+def labels_for_issue(title: str, body: str = "") -> list:
+    text = ((title or "") + " " + (body or "")).lower()
     labels = []
     if "error" in text:
         labels.append("bug")
@@ -13,11 +14,8 @@ def get_labels(title: str, body: str = "") -> list:
         labels.append("feature")
     return labels
 
+
 if __name__ == "__main__":
-    samples = [
-        "error test",
-        "feature adding requirements",
-        "email feature adding error",
-    ]
-    for s in samples:
-        print(f"{s!r} -> {get_labels(s)}")
+    tests = ["error test", "feature adding requirements", "email feature adding error"]
+    for t in tests:
+        print(f"{t!r} -> {labels_for_issue(t)}")
