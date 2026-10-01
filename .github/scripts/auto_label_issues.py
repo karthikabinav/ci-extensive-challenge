@@ -1,23 +1,14 @@
-import re
+#!/usr/bin/env python3
+"""Auto label issues by keyword: error -> bug, add -> feature."""
+import os
 
-def get_labels(title, body=""):
-    text = f"{title} {body}".lower()
-    labels = []
-    if "error" in text:
-        labels.append("bug")
-    if "add" in text:
-        labels.append("feature")
-    return labels
+KEYWORD_LABELS = {"error": "bug", "add": "feature"}
 
-# Example usage for GitHub Action context
+def determine_labels(text):
+    text = (text or "").lower()
+    return [label for keyword, label in KEYWORD_LABELS.items() if keyword in text]
+
 if __name__ == "__main__":
-    # This script would be called by a GitHub workflow
-    # It demonstrates the labeling logic required for the project
-    test_cases = [
-        ("error test", ["bug"]),
-        ("feature adding requirements", ["feature"]),
-        ("email feature adding error", ["bug", "feature"]),
-    ]
-    for title, expected in test_cases:
-        result = get_labels(title)
-        print(f"Title: {title!r} -> Labels: {result} (expected {expected})")
+    title = os.environ.get("ISSUE_TITLE", "")
+    body = os.environ.get("ISSUE_BODY", "")
+    print(determine_labels(title + " " + body))
