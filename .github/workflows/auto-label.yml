@@ -1,23 +1,26 @@
-name: Auto-label issues
-
+name: Auto Label Issues by Keyword
 on:
   issues:
-    types: [opened, edited]
-
+    types: [opened]
 permissions:
   issues: write
-
 jobs:
   label:
-    name: Auto label by keyword
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Apply keyword labels
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_BODY: ${{ github.event.issue.body }}
-        run: python .github/scripts/auto_label.py
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const text = ((issue.title || "") + " " + (issue.body || "")).toLowerCase();
+            const labels = [];
+            if (text.includes("error")) labels.push("bug");
+            if (text.includes("add")) labels.push("feature");
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                labels: labels
+              });
+            }
