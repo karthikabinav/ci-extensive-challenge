@@ -1,31 +1,20 @@
-name: Auto Label Issues
-
+name: Label Issues
 on:
   issues:
     types: [opened]
-
-permissions:
-  contents: read
-  issues: write
-
 jobs:
   label:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
-      - name: Apply keyword labels
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const issue = context.payload.issue;
-            const text = ((issue.title || "") + " " + (issue.body || "")).toLowerCase();
-            const labels = [];
-            if (text.includes("error")) labels.push("bug");
-            if (text.includes("add")) labels.push("feature");
-            if (labels.length > 0) {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issue.number,
-                labels
-              });
-            }
+      - name: Label bug
+        if: contains(github.event.issue.title, 'error') || contains(github.event.issue.body, 'error')
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "bug" --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Label feature
+        if: contains(github.event.issue.title, 'add') || contains(github.event.issue.body, 'add')
+        run: gh issue edit ${{ github.event.issue.number }} --add-label "feature" --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
