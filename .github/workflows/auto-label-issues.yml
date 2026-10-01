@@ -3,6 +3,12 @@ name: Auto-label issues
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to label or retry
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -18,7 +24,20 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             // Read issue text as data, never as executable code or shell input.
-            const issue = context.payload.issue;
+            let issue = context.payload.issue;
+            if (context.eventName === "workflow_dispatch") {
+              const value = context.payload.inputs.issue_number || "";
+              const number = Number(value);
+              if (!/^[1-9][0-9]*$/.test(value) || !Number.isSafeInteger(number)) {
+                throw new Error("A positive integer issue number is required.");
+              }
+              issue = (await github.rest.issues.get({
+                ...context.repo, issue_number: number
+              })).data;
+            }
+            if (!issue || issue.pull_request) {
+              throw new Error("Only repository issues are supported.");
+            }
             const text = [issue.title || "", issue.body || ""].join("\n").toLowerCase();
             const rules = [
               { keyword: "error", name: "bug", color: "d73a4a", description: "Something is not working" },
@@ -58,3 +77,4 @@ jobs:
               issue_number: issue.number,
               labels: matches.map(label => label.name)
             });
+            core.info("Labeled issue #" + issue.number + ": " + matches.map(label => label.name).join(", "));
