@@ -1,0 +1,60 @@
+name: Keyword Issue Labeler
+
+# Automatically labels newly opened issues based on keywords found in the
+# issue title or body (case-insensitive):
+#   - contains "error" -> adds label "bug"
+#   - contains "add"   -> adds label "feature"
+# Both labels are applied when both keywords are present.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Apply labels by keyword
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Issue text is handled purely as data; it is never interpolated into a shell.
+            const issue = context.payload.issue;
+            const text = `${issue.title || ""}\n${issue.body || ""}`.toLowerCase();
+
+            const rules = [
+              { keyword: "error", label: "bug",     color: "d73a4a", description: "Something isn't working" },
+              { keyword: "add",   label: "feature", color: "a2eeef", description: "New feature or request" },
+            ];
+
+            const matched = rules.filter((rule) => text.includes(rule.keyword));
+            if (matched.length === 0) {
+              core.info("No keywords matched; no labels applied.");
+              return;
+            }
+
+            // Ensure each label exists in the repository before applying it.
+            for (const { label, color, description } of matched) {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name: label });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+                try {
+                  await github.rest.issues.createLabel({ ...context.repo, name: label, color, description });
+                } catch (createErr) {
+                  if (createErr.status !== 422) throw createErr; // 422 = created concurrently
+                }
+              }
+            }
+
+            // addLabels appends; it never removes existing labels.
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: issue.number,
+              labels: matched.map((rule) => rule.label),
+            });
+            core.info(`Applied labels: ${matched.map((r) => r.label).join(", ")}`);
