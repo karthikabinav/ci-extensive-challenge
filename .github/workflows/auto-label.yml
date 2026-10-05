@@ -16,6 +16,15 @@ jobs:
             const labels = [];
             if (text.includes("error")) labels.push("bug");
             if (text.includes("add")) labels.push("feature");
+            for (const name of labels) {
+              try {
+                await github.rest.issues.getLabel({owner: context.repo.owner, repo: context.repo.repo, name});
+              } catch (e) {
+                if (e.status === 404) {
+                  await github.rest.issues.createLabel({owner: context.repo.owner, repo: context.repo.repo, name, color: name === "bug" ? "d73a4a" : "a2eeef"});
+                } else { throw e; }
+              }
+            }
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
