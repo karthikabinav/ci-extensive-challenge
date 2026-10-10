@@ -2,31 +2,36 @@ name: Auto Label Issues by Keyword
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited, reopened]
 
 permissions:
   issues: write
+  contents: read
 
 jobs:
-  label:
+  auto-label:
     runs-on: ubuntu-latest
     steps:
-      - name: Label issue by keyword
+      - name: Apply labels based on keywords
         uses: actions/github-script@v7
         with:
           script: |
             const issue = context.payload.issue;
             const title = (issue.title || "").toLowerCase();
             const body = (issue.body || "").toLowerCase();
-            const text = title + " " + body;
+            const text = `${title} ${body}`;
             const labels = [];
-            if (text.includes("error")) labels.push("bug");
-            if (text.includes("add")) labels.push("feature");
+            if (text.includes("error")) {
+              labels.push("bug");
+            }
+            if (text.includes("add")) {
+              labels.push("feature");
+            }
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issue.number,
-                labels: labels
+                labels,
               });
             }
