@@ -11,7 +11,6 @@ def get_labels(title, body=""):
     return labels
 
 if __name__ == "__main__":
-    import sys
-    title = sys.argv[1] if len(sys.argv) > 1 else ""
-    body = sys.argv[2] if len(sys.argv) > 2 else ""
-    print(get_labels(title, body))
+    examples = ["error test", "feature adding requirements", "email feature adding error"]
+    for title in examples:
+        print(title, "->", get_labels(title))
