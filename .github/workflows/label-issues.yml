@@ -21,11 +21,9 @@ jobs:
             const body = (issue.body || "").toLowerCase();
             const text = `${title} ${body}`;
             const labels = [];
-            // Rule: "error" -> bug
             if (text.includes("error")) {
               labels.push("bug");
             }
-            // Rule: "add" -> feature
             if (text.includes("add")) {
               labels.push("feature");
             }
@@ -36,7 +34,4 @@ jobs:
                 issue_number: issue.number,
                 labels,
               });
-              core.info(`Added labels: ${labels.join(", ")}`);
-            } else {
-              core.info("No matching keywords found; no labels added.");
             }
