@@ -2,7 +2,7 @@ name: Auto Label Issues by Keyword
 
 on:
   issues:
-    types: [opened]
+    types: [opened, edited, reopened]
 
 permissions:
   issues: write
