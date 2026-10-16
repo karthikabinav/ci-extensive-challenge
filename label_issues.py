@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
-"""Automatically label issues by keyword: bug if contains error, feature if contains add."""
+# Script to automatically label new issues by keyword
+# label "bug" if issue contains "error", and "feature" if it contains "add"
 
-def labels_for_issue(title, body=""):
+def get_labels(title, body=""):
     text = f"{title} {body}".lower()
     labels = []
     if "error" in text:
@@ -11,6 +11,5 @@ def labels_for_issue(title, body=""):
     return labels
 
 if __name__ == "__main__":
-    tests = ["error test", "feature adding requirements", "email feature adding error"]
-    for t in tests:
-        print(t, labels_for_issue(t))
+    for title in ["error test", "feature adding requirements", "email feature adding error"]:
+        print(title, "->", get_labels(title))
