@@ -1,12 +1,14 @@
-def labels_for_issue(title, body=""):
-    text = f"{title} {body}".lower()
+import re
+
+def labels_for(text):
+    t = (text or "").lower()
     labels = []
-    if "error" in text:
+    if "error" in t:
         labels.append("bug")
-    if "add" in text:
+    if "add" in t:
         labels.append("feature")
     return labels
 
 if __name__ == "__main__":
-    for title in ["error test", "feature adding requirements", "email feature adding error"]:
-        print(title, labels_for_issue(title))
+    import sys
+    print(labels_for(sys.argv[1] if len(sys.argv) > 1 else ""))
