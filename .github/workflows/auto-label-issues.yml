@@ -3,6 +3,12 @@ name: Auto Label Issues by Keyword
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Existing issue number to label for testing
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -16,7 +22,18 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
-            const issue = context.payload.issue;
+            let issue = context.payload.issue;
+            if (context.eventName === "workflow_dispatch") {
+              const input = context.payload.inputs.issue_number || "";
+              const issueNumber = Number(input);
+              if (!/^[1-9][0-9]*$/.test(input) || !Number.isSafeInteger(issueNumber)) {
+                throw new Error("issue_number must be a positive integer");
+              }
+              issue = (await github.rest.issues.get({
+                ...context.repo, issue_number: issueNumber
+              })).data;
+            }
+            if (!issue || issue.pull_request) throw new Error("Expected an issue, not a pull request");
             const text = `${issue.title || ""} ${issue.body || ""}`.toLowerCase();
             const labels = [];
             if (text.includes("error")) labels.push("bug");
@@ -45,3 +62,4 @@ jobs:
                 labels
               });
             }
+            core.info(`Issue #${issue.number}: matching labels = ${labels.join(", ") || "none"}`);
