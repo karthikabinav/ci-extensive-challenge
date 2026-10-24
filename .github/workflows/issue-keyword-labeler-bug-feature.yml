@@ -1,0 +1,69 @@
+name: Keyword Issue Labeler
+
+# Automatically labels newly opened issues based on keywords found in the
+# issue title or body (case-insensitive substring match):
+#   - "error" -> label "bug"
+#   - "add"   -> label "feature"   (e.g. "adding" also matches)
+# An issue that contains both keywords receives both labels.
+
+on:
+  issues:
+    types: [opened]
+
+# Least-privilege token: the job only needs to read/write issue labels.
+permissions:
+  issues: write
+
+jobs:
+  label-by-keyword:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Apply keyword labels
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            // The issue text is read from the event payload inside JavaScript and is
+            // never interpolated into a shell command, so untrusted issue titles or
+            // bodies cannot inject code into the workflow.
+            const issue = context.payload.issue;
+            const text = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
+
+            const rules = [
+              { keyword: 'error', label: 'bug', color: 'd73a4a', description: 'Something is not working' },
+              { keyword: 'add', label: 'feature', color: 'a2eeef', description: 'New feature or request' },
+            ];
+
+            const matched = rules.filter((rule) => text.includes(rule.keyword));
+            if (matched.length === 0) {
+              core.info(`Issue #${issue.number}: no keywords matched, no labels added.`);
+              return;
+            }
+
+            // Make sure each label exists (creates it with a color/description if missing).
+            for (const rule of matched) {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name: rule.label });
+              } catch (err) {
+                if (err.status !== 404) throw err;
+                try {
+                  await github.rest.issues.createLabel({
+                    ...context.repo,
+                    name: rule.label,
+                    color: rule.color,
+                    description: rule.description,
+                  });
+                } catch (createErr) {
+                  // 422 means the label already exists (e.g. created concurrently).
+                  if (createErr.status !== 422) throw createErr;
+                }
+              }
+            }
+
+            const labels = matched.map((rule) => rule.label);
+            await github.rest.issues.addLabels({
+              ...context.repo,
+              issue_number: issue.number,
+              labels,
+            });
+            core.info(`Issue #${issue.number}: added labels ${labels.join(', ')}`);
