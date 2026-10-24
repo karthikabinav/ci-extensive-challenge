@@ -5,10 +5,20 @@ name: Keyword Issue Labeler
 #   - "error" -> label "bug"
 #   - "add"   -> label "feature"   (e.g. "adding" also matches)
 # An issue that contains both keywords receives both labels.
+#
+# The same logic can also be run manually for an existing issue
+# (Actions tab -> "Keyword Issue Labeler" -> "Run workflow" -> issue number),
+# e.g. if GitHub skipped the automatic run for that issue.
 
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Number of an existing issue to label"
+        required: true
+        type: string
 
 # Least-privilege token: the job only needs to read/write issue labels.
 permissions:
@@ -23,10 +33,26 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
-            // The issue text is read from the event payload inside JavaScript and is
-            // never interpolated into a shell command, so untrusted issue titles or
+            // The issue text is read from the event payload / API inside JavaScript and
+            // is never interpolated into a shell command, so untrusted issue titles or
             // bodies cannot inject code into the workflow.
-            const issue = context.payload.issue;
+            let issue = context.payload.issue;
+
+            if (!issue) {
+              // Manual run (workflow_dispatch): load the requested issue.
+              const raw = String((context.payload.inputs || {}).issue_number || '').trim();
+              if (!/^[1-9][0-9]*$/.test(raw)) {
+                core.setFailed(`Invalid issue_number input: "${raw}"`);
+                return;
+              }
+              const { data } = await github.rest.issues.get({ ...context.repo, issue_number: Number(raw) });
+              if (data.pull_request) {
+                core.setFailed(`#${raw} is a pull request, not an issue.`);
+                return;
+              }
+              issue = data;
+            }
+
             const text = `${issue.title || ''}\n${issue.body || ''}`.toLowerCase();
 
             const rules = [
