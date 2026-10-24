@@ -1,65 +1,24 @@
-name: Auto Label Issues by Keyword
+name: Auto Label Issues
 
 on:
   issues:
     types: [opened]
-  workflow_dispatch:
-    inputs:
-      issue_number:
-        description: Existing issue number to label for testing
-        required: true
-        type: string
 
 permissions:
   issues: write
 
 jobs:
-  auto-label:
+  label-issue:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
     steps:
       - name: Label issue by keyword
-        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        uses: actions/github-script@v7
         with:
           script: |
-            let issue = context.payload.issue;
-            if (context.eventName === "workflow_dispatch") {
-              const input = context.payload.inputs.issue_number || "";
-              const issueNumber = Number(input);
-              if (!/^[1-9][0-9]*$/.test(input) || !Number.isSafeInteger(issueNumber)) {
-                throw new Error("issue_number must be a positive integer");
-              }
-              issue = (await github.rest.issues.get({
-                ...context.repo, issue_number: issueNumber
-              })).data;
-            }
-            if (!issue || issue.pull_request) throw new Error("Expected an issue, not a pull request");
-            const text = `${issue.title || ""} ${issue.body || ""}`.toLowerCase();
+            const issue = context.payload.issue;
+            const text = (issue.title + " " + (issue.body || "")).toLowerCase();
             const labels = [];
             if (text.includes("error")) labels.push("bug");
             if (text.includes("add")) labels.push("feature");
-            const definitions = {
-              bug: { color: "d73a4a", description: "An issue containing the error keyword" },
-              feature: { color: "a2eeef", description: "An issue containing the add keyword" }
-            };
-            for (const name of labels) {
-              try {
-                await github.rest.issues.getLabel({ ...context.repo, name });
-              } catch (error) {
-                if (error.status !== 404) throw error;
-                try {
-                  await github.rest.issues.createLabel({ ...context.repo, name, ...definitions[name] });
-                } catch (creationError) {
-                  if (creationError.status !== 422) throw creationError;
-                  await github.rest.issues.getLabel({ ...context.repo, name });
-                }
-              }
-            }
-            if (labels.length > 0) {
-              await github.rest.issues.addLabels({
-                ...context.repo,
-                issue_number: issue.number,
-                labels
-              });
-            }
-            core.info(`Issue #${issue.number}: matching labels = ${labels.join(", ") || "none"}`);
+            if (labels.length === 0) return;
+            await github.rest.issues.addLabels({owner: context.repo.owner, repo: context.repo.repo, issue_number: issue.number, labels});
