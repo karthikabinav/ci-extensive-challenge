@@ -38,8 +38,7 @@ jobs:
             if (!issue || issue.pull_request) {
               throw new Error("This workflow labels issues only");
             }
-            const text = `${issue.title || ""}
-${issue.body || ""}`.toLowerCase();
+            const text = [issue.title || "", issue.body || ""].join("\n").toLowerCase();
             const labels = [];
             if (text.includes("error")) labels.push("bug");
             if (text.includes("add")) labels.push("feature");
