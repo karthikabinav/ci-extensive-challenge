@@ -3,6 +3,12 @@ name: Issue Labeler
 on:
   issues:
     types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: Issue number to label for a manual test
+        required: true
+        type: string
 
 permissions:
   issues: write
@@ -16,14 +22,27 @@ jobs:
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
-            const issue = context.payload.issue;
+            let issue = context.payload.issue;
+            // Manual runs use the same labeling logic as newly opened issues.
+            if (!issue) {
+              const issueNumber = Number(context.payload.inputs?.issue_number);
+              if (!Number.isSafeInteger(issueNumber) || issueNumber < 1) {
+                throw new Error("Provide a positive integer issue_number.");
+              }
+              ({ data: issue } = await github.rest.issues.get({
+                ...context.repo,
+                issue_number: issueNumber
+              }));
+            }
+            if (issue.pull_request) return;
+
             // Treat the issue title and body as data, never as executable code.
             const text = ((issue.title || "") + "\n" + (issue.body || "")).toLowerCase();
             const rules = [
               { keyword: "error", name: "bug", color: "d73a4a", description: "Something is not working" },
               { keyword: "add", name: "feature", color: "a2eeef", description: "New feature or request" }
             ];
-            // Match each keyword independently so an issue can receive both labels.
+            // Independent substring matches allow both labels on the same issue.
             const matches = rules.filter(rule => text.includes(rule.keyword));
             if (matches.length === 0) return;
 
@@ -43,10 +62,10 @@ jobs:
             }
 
             const labels = matches.map(rule => rule.name);
-            // Add only the matching labels; preserve any existing labels.
+            // Add matching labels without removing existing labels.
             await github.rest.issues.addLabels({
               ...context.repo,
               issue_number: issue.number,
               labels
             });
-            core.info("Applied labels: " + labels.join(", "));
+            core.info("Labeled issue #" + issue.number + ": " + labels.join(", "));
