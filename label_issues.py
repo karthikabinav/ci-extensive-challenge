@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Automatically labels new issues by keyword.
+"""
+Automatically labels new issues by keyword.
 - label "bug" if the issue contains "error"
 - label "feature" if the issue contains "add"
 """
