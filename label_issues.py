@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
-"""
-Automatically labels new issues by keyword.
+"""Automatically labels new issues by keyword.
 - label "bug" if the issue contains "error"
 - label "feature" if the issue contains "add"
 """
-import os, json, urllib.request
+import os, json
 
 def labels_for(text):
     t = (text or "").lower()
