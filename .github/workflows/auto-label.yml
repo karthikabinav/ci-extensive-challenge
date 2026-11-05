@@ -1,4 +1,4 @@
-name: Auto Label Issues
+name: Auto Label Issues by Keyword
 on:
   issues:
     types: [opened]
@@ -22,7 +22,7 @@ jobs:
               await github.rest.issues.addLabels({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.payload.issue.number,
-                labels
+                issue_number: context.issue.number,
+                labels: labels
               });
             }
