@@ -1,17 +1,27 @@
-#!/usr/bin/env python3
-"""Automatically label GitHub issues by keyword.
-Rules: label "bug" if the issue contains "error", and "feature" if it contains "add" (case-insensitive).
+"""
+Auto-label issues by keyword:
+- label "bug" if issue title/body contains "error"
+- label "feature" if contains "add"
 """
 
-def determine_labels(text):
-    t = text.lower()
+def get_labels(title: str, body: str = ""):
+    text = f"{title} {body}".lower()
     labels = []
-    if "error" in t:
+    if "error" in text:
         labels.append("bug")
-    if "add" in t:
+    if "add" in text:
         labels.append("feature")
     return labels
 
+# Example usage for GitHub automation (e.g., in Actions or webhook):
+# labels = get_labels(issue_title, issue_body)
+# then apply labels via GitHub API
+
 if __name__ == "__main__":
-    # Example usage: determine_labels(issue_title + " " + issue_body)
-    pass
+    tests = [
+        "error test",
+        "feature adding requirements",
+        "email feature adding error",
+    ]
+    for t in tests:
+        print(f"{t!r} -> {get_labels(t)}")
