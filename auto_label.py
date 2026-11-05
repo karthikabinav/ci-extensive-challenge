@@ -1,5 +1,8 @@
-# Auto-label script for GitHub issues
-# Labels new issues by keyword: "bug" if contains "error", "feature" if contains "add"
+"""
+Auto-label issues by keyword
+- label bug if issue contains error
+- label feature if issue contains add
+"""
 
 def get_labels(title: str, body: str = ""):
     text = f"{title} {body}".lower()
@@ -10,8 +13,9 @@ def get_labels(title: str, body: str = ""):
         labels.append("feature")
     return labels
 
-# Example usage with GitHub API (pseudo):
-# for issue in new_issues:
-#     labels = get_labels(issue.title, issue.body)
-#     if labels:
-#         update_issue(issue.number, labels=labels)
+# Example usage for GitHub Actions or manual test
+if __name__ == "__main__":
+    import sys
+    title = sys.argv[1] if len(sys.argv) > 1 else ""
+    body = sys.argv[2] if len(sys.argv) > 2 else ""
+    print(",".join(get_labels(title, body)))
